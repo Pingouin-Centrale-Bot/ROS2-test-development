@@ -4,15 +4,12 @@
 namespace micro_ros_hardware
 {
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // on_init : lecture du URDF, initialisation des vecteurs
-        // ─────────────────────────────────────────────────────────────────────────────
         hardware_interface::CallbackReturn MicroRosHardwareInterface::on_init(const hardware_interface::HardwareInfo & info){
                 if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS){
                         return hardware_interface::CallbackReturn::ERROR;
                 }
 
-                // Récupération des topics depuis les paramètres URDF (optionnel, valeurs par défaut)
                 cmd_topic_   = info_.hardware_parameters.count("cmd_topic")
                                 ? info_.hardware_parameters.at("cmd_topic")
                                 : "/wheel_commands";
@@ -20,7 +17,6 @@ namespace micro_ros_hardware
                                 ? info_.hardware_parameters.at("state_topic")
                                 : "/micro_controller/joint_states";
 
-                // Initialisation des vecteurs selon le nombre de joints déclarés dans le URDF
                 joint_names_.resize(info_.joints.size());
                 hw_states_position_.resize(info_.joints.size(), 0.0);
                 hw_states_velocity_.resize(info_.joints.size(), 0.0);
@@ -35,9 +31,7 @@ namespace micro_ros_hardware
                 return hardware_interface::CallbackReturn::SUCCESS;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // on_configure : création du node ROS2, publisher et subscriber
-        // ─────────────────────────────────────────────────────────────────────────────
         hardware_interface::CallbackReturn MicroRosHardwareInterface::on_configure(const rclcpp_lifecycle::State & /*previous_state*/){
                 node_ = rclcpp::Node::make_shared("micro_ros_hardware_interface");
 
@@ -65,9 +59,7 @@ namespace micro_ros_hardware
                 return hardware_interface::CallbackReturn::SUCCESS;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // on_activate / on_deactivate
-        // ─────────────────────────────────────────────────────────────────────────────
         hardware_interface::CallbackReturn MicroRosHardwareInterface::on_activate(const rclcpp_lifecycle::State & /*previous_state*/){
                 // Reset des commandes à zéro à l'activation
                 std::fill(hw_commands_velocity_.begin(), hw_commands_velocity_.end(), 0.0);
@@ -84,9 +76,7 @@ namespace micro_ros_hardware
                 return hardware_interface::CallbackReturn::SUCCESS;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // export_state_interfaces : position + vitesse pour chaque joint
-        // ─────────────────────────────────────────────────────────────────────────────
         std::vector<hardware_interface::StateInterface>MicroRosHardwareInterface::export_state_interfaces(){
                 std::vector<hardware_interface::StateInterface> state_interfaces;
 
@@ -107,9 +97,7 @@ namespace micro_ros_hardware
                 return state_interfaces;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
-        // export_command_interfaces : vitesse cible pour chaque joint
-        // ─────────────────────────────────────────────────────────────────────────────
+        // export_command_interfaces : vitesse à donner pour chaque roues
         std::vector<hardware_interface::CommandInterface>MicroRosHardwareInterface::export_command_interfaces(){
                 std::vector<hardware_interface::CommandInterface> command_interfaces;
 
@@ -124,21 +112,17 @@ namespace micro_ros_hardware
                 return command_interfaces;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // read() : récupère les encodeurs de l'ESP32 → state interfaces
-        // ─────────────────────────────────────────────────────────────────────────────
         hardware_interface::return_type MicroRosHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/){
                 // Spin le node pour traiter les callbacks entrants
                 rclcpp::spin_some(node_);
 
                 if (!joint_states_received_) {
-                        // Pas encore de données ESP32, on garde les zéros
                         return hardware_interface::return_type::OK;
                 }
 
                 std::lock_guard<std::mutex> lock(joint_state_mutex_);
 
-                // Mappe les données reçues sur les bons joints (par nom)
                 for (size_t i = 0; i < joint_names_.size(); ++i) {
                         for (size_t j = 0; j < latest_joint_states_.name.size(); ++j) {
                                 if (latest_joint_states_.name[j] == joint_names_[i]) {
@@ -156,9 +140,7 @@ namespace micro_ros_hardware
                 return hardware_interface::return_type::OK;
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
         // write() : envoie les commandes de vitesse vers l'ESP32
-        // ─────────────────────────────────────────────────────────────────────────────
         hardware_interface::return_type MicroRosHardwareInterface::write(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/){
                 std_msgs::msg::Float64MultiArray msg;
 
@@ -176,9 +158,6 @@ namespace micro_ros_hardware
 
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Export du plugin pour pluginlib
-// ─────────────────────────────────────────────────────────────────────────────
 PLUGINLIB_EXPORT_CLASS(
   micro_ros_hardware::MicroRosHardwareInterface,
   hardware_interface::SystemInterface
