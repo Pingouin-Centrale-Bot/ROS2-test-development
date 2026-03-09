@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <robot name="simple_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-        <xacro:include filename="$(find car_square)/model/gazebo.xacro"/>
-
         <xacro:include filename="$(find car_square)/model/wheels/omni_wheel.urdf.xacro"/>
+
+        <xacro:include filename="$(find car_square)/model/gazebo.xacro"/>
 
         <link name="base_link">
                 <visual>

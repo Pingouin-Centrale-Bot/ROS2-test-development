@@ -1,42 +1,44 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-<gazebo>
+    <gazebo>
         <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-                <parameters>$(find car_square)/config/robot_controller.yaml</parameters>
+            <parameters>$(find car_square)/config/robot_controller.yaml</parameters>
         </plugin>
-</gazebo>
+    </gazebo>
 
-
-<gazebo>
-        <plugin 
-                filename="gz-sim-sensors-system"
-                name="gz::sim::systems::Sensors">
-                <render_engine>ogre2</render_engine>
+    <gazebo>
+        <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+            <render_engine>ogre2</render_engine>
         </plugin>
-</gazebo>
+    </gazebo>
 
+    <xacro:property name="friction_coefficient" value="1.0"/>
+    <xacro:property name="num_rollers" value="6"/>
 
+    <xacro:macro name="set_friction_for_one" params="name">
+        <gazebo reference="${name}">
+                <mu1>${friction_coefficient}</mu1>
+                <mu2>${friction_coefficient}</mu2>
+        </gazebo>
+    </xacro:macro>
 
-<gazebo reference="lf_hub">
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-</gazebo>
+    <xacro:macro name="set_frictions" params="prefix idx">
+        <xacro:if value="${idx &lt; num_rollers}">
+                <xacro:set_friction_for_one name="${prefix}_roller_${idx}"></xacro:set_friction_for_one>
+                <xacro:set_friction_for_one name="${prefix}_roller_neighbor_${idx}"></xacro:set_friction_for_one>
+                <xacro:set_frictions prefix="${prefix}" idx="${idx + 1}" />
+        </xacro:if>
+    </xacro:macro>
 
-<gazebo reference="rf_hub">
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-</gazebo>
+    <xacro:macro name="wheel_friction" params="prefix">
+        <xacro:set_friction_for_one name="${prefix}_hub"></xacro:set_friction_for_one>
+        <xacro:set_frictions prefix="${prefix}" idx="0"/>
+    </xacro:macro>
 
-<gazebo reference="lb_hub">
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-</gazebo>
-
-<gazebo reference="rb_hub">
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-</gazebo>
-
+    <xacro:wheel_friction prefix="lf"/>
+    <xacro:wheel_friction prefix="rf"/>
+    <xacro:wheel_friction prefix="lb"/>
+    <xacro:wheel_friction prefix="rb"/>
 
 </robot>

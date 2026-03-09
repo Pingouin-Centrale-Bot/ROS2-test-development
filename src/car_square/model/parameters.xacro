@@ -37,6 +37,8 @@
 <xacro:property name="roller_count" value="6"/>
 
 
+<xacro:property name="friction_coefficient" value="100"/>
+
 
 <material name="blue">
         <color rgba="0 0 1 1"/>

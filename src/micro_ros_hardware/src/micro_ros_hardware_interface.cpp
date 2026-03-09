@@ -48,7 +48,8 @@ namespace micro_ros_hardware
                 
                 // Subscriber ← ESP32 : positions et vitesses encodeurs
                 joint_state_sub_ = node_->create_subscription<sensor_msgs::msg::JointState>(
-                        state_topic_, rclcpp::QoS(10),
+                        state_topic_, 
+                        rclcpp::QoS(10),
                         [this](const sensor_msgs::msg::JointState::SharedPtr msg) {
                                 std::lock_guard<std::mutex> lock(joint_state_mutex_);
                                 latest_joint_states_ = *msg;
@@ -57,8 +58,8 @@ namespace micro_ros_hardware
                 );
 
                 RCLCPP_INFO(rclcpp::get_logger("MicroRosHardwareInterface"),
-                        "Configuré — cmd: %s and %s | states: %s",
-                        cmd_topic_.c_str(), cmd_topic_.c_str(), state_topic_.c_str()
+                        "Configuré — cmd: %s | states: %s",
+                        cmd_topic_.c_str(), state_topic_.c_str()
                 );
 
                 return hardware_interface::CallbackReturn::SUCCESS;
