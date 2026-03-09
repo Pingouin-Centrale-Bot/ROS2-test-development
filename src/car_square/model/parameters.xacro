@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+
+<xacro:property name="SCALE_FACTOR" value="5" />
+
+
+<xacro:property name="chassis_length" value="${0.5*SCALE_FACTOR}" />
+<xacro:property name="chassis_width" value="${0.5*SCALE_FACTOR}" />
+<xacro:property name="chassis_height" value="${0.1*SCALE_FACTOR}" />
+<xacro:property name="chassis_offset" value="${0.15*SCALE_FACTOR}" />
+
+<xacro:property name="chassis_density" value="271.0"/>
+<xacro:property name="chassis_mass" value="${chassis_density * (chassis_length * chassis_width * chassis_height)}"/>
+
+<xacro:property name="Ix_chassis" value="${(1/12)*chassis_mass*(chassis_width*chassis_width+chassis_height*chassis_height)}" />
+<xacro:property name="Iy_chassis" value="${(1/12)*chassis_mass*(chassis_length*chassis_length+chassis_width*chassis_width)}" />
+<xacro:property name="Iz_chassis" value="${(1/12)*chassis_mass*(chassis_length*chassis_length+chassis_height*chassis_height)}" />
+
+<xacro:macro name="chassis_inertia">
+        <inertial>
+                <origin xyz="0 0 ${chassis_offset}" rpy="0 0 0"/>
+                <mass value="${chassis_mass}"/>
+                <inertia ixx="${Ix_chassis}" ixy="0.0" ixz="0.0" iyy="${Iy_chassis}" iyz="0" izz="${Iz_chassis}" />
+        </inertial>
+</xacro:macro>
+
+
+<xacro:property name="r" value="${0.1*SCALE_FACTOR}" />
+<xacro:property name="wheel_radius" value="${0.06*SCALE_FACTOR}"/>
+<xacro:property name="wheel_width" value="${0.02*SCALE_FACTOR}"/>
+
+<xacro:property name="roller_radius" value="${0.01*SCALE_FACTOR}"/>
+<xacro:property name="roller_length" value="${0.03*SCALE_FACTOR}"/>
+<xacro:property name="roller_count" value="6"/>
+
+
+
+<material name="blue">
+        <color rgba="0 0 1 1"/>
+</material>
+
+<material name="red">
+        <color rgba="1 0 0 1"/>
+</material>
+
+<material name="green">
+        <color rgba="0 1 0 1"/>
+</material>
+
+<material name="yellow">
+        <color rgba="1 1 0 1"/>
+</material>
+
+<material name="magenta">
+        <color rgba="1 0 1 1" />
+</material>
+
+<material name="cyan">
+        <color rgba="0 1 1 1" />
+</material>
+
+<material name="white">
+        <color rgba="1 1 1 1" />
+</material>
+
+</robot>

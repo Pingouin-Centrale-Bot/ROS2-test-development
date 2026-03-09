@@ -1,0 +1,12 @@
+<library path="micro_ros_hardware">
+  <class
+    name="micro_ros_hardware/MicroRosHardwareInterface"
+    type="micro_ros_hardware::MicroRosHardwareInterface"
+    base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Hardware interface qui bridge ros2_control avec un ESP32 via micro-ROS.
+      - write() publie les vitesses cibles sur /wheel_commands (Float64MultiArray)
+      - read()  souscrit aux encodeurs sur /esp32/joint_states (JointState)
+    </description>
+  </class>
+</library>

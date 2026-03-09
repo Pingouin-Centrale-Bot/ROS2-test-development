@@ -1,0 +1,7 @@
+subscriber_node:
+  ros__parameters:
+    subscriber_message: "Welcoming message from subscriber!"
+
+publisher_node:
+  ros__parameters:
+    publisher_message: " (Value from publisher)"

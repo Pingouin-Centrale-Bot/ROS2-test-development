@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find car_square)/model/parameters.xacro"/>
+  <!-- ========== MACRO ROLLER ========== -->
+  <xacro:macro name="roller" params="prefix parent idx angle1 angle2 wheel_radius wheel_width roller_radius roller_length">
+
+    <link name="${prefix}_roller_${idx}">
+      <inertial>
+        <origin xyz="0 0 0"/>
+        <mass value="0.02"/>
+        <inertia
+          ixx="0.00001" iyy="0.00001" izz="0.00001"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+
+      <collision>
+        <origin rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+        </geometry>
+        <material name="white" />
+      </visual>
+    </link>
+
+    <link name="${prefix}_roller_neighbor_${idx}">
+      <inertial>
+        <origin xyz="0 0 0"/>
+        <mass value="0.02"/>
+        <inertia
+          ixx="0.00001" iyy="0.00001" izz="0.00001"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+
+      <collision>
+        <origin rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin rpy="1.5708 0 0"/>
+        <geometry>
+          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+        </geometry>
+        <material name="white" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}_roller_${idx}_joint" type="continuous">
+      <parent link="${parent}"/>
+      <child link="${prefix}_roller_${idx}"/>
+      <origin
+        xyz="${(wheel_radius - roller_radius) * cos(angle1)} ${-wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle1)}"
+        rpy="${3*pi/2 - angle1} 0 1.5708"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <joint name="${prefix}_roller_neighbor_${idx}_joint" type="continuous">
+      <parent link="${parent}"/>
+      <child link="${prefix}_roller_neighbor_${idx}"/>
+      <origin
+        xyz="${(wheel_radius - roller_radius) * cos(angle2)} ${2*roller_radius - wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle2)}"
+        rpy="${3*pi/2 - angle2} 0 1.5708"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+
+  </xacro:macro>
+
+
+  <!-- ========== RÉCURSION ========== -->
+  <xacro:macro name="roller_loop"
+               params="prefix parent idx count wheel_radius wheel_width roller_radius roller_length">
+
+    <xacro:if value="${idx &lt; count}">
+      <xacro:property name="angle1"
+                      value="${2 * pi * idx / count}"/>
+      <xacro:property name="angle2"
+                      value="${2 * pi * idx / count + pi / count}" />
+
+      <xacro:roller
+        prefix="${prefix}"
+        parent="${parent}"
+        idx="${idx}"
+        angle1="${angle1}"
+        angle2="${angle2}"
+        wheel_radius="${wheel_radius}"
+        wheel_width="${wheel_width}"
+        roller_radius="${roller_radius}"
+        roller_length="${roller_length}"/>
+
+      <!-- appel récursif -->
+      <xacro:roller_loop
+        prefix="${prefix}"
+        parent="${parent}"
+        idx="${idx + 1}"
+        count="${count}"
+        wheel_radius="${wheel_radius}"
+        wheel_width="${wheel_width}"
+        roller_radius="${roller_radius}"
+        roller_length="${roller_length}"/>
+    </xacro:if>
+
+  </xacro:macro>
+
+
+  <!-- ========== OMNI WHEEL COMPLETE ========== -->
+  <xacro:macro name="omni_wheel"
+               params="prefix parent xyz rpy">
+
+    <!-- moyeu -->
+    <link name="${prefix}_hub">
+      <inertial>
+        <origin xyz="0 0 0"/>
+        <mass value="0.5"/>
+        <inertia
+          ixx="0.001" iyy="0.001" izz="0.001"
+          ixy="0.0" ixz="0.0" iyz="0.0"/>
+      </inertial>
+
+      <visual>
+        <geometry>
+          <cylinder radius="${7*wheel_radius/8}" length="${3*wheel_width/2}"/>
+        </geometry>
+        <material name="blue"/>
+        <origin rpy="1.5708 0 0"/>
+      </visual>
+
+      <collision>
+        <geometry>
+          <cylinder radius="${7*wheel_radius/8}" length="${3*wheel_width/2}"/>
+        </geometry>
+        <material name="blue"/>
+        <origin rpy="1.5708 0 0"/>
+      </collision>
+    </link>
+
+
+    <joint name="${prefix}_joint" type="continuous">
+      <parent link="${parent}"/>
+      <child link="${prefix}_hub"/>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <!-- génération des rollers -->
+    <xacro:roller_loop
+      prefix="${prefix}"
+      parent="${prefix}_hub"
+      idx="0"
+      count="${roller_count}"
+      wheel_radius="${wheel_radius}"
+      wheel_width="${wheel_width}"
+      roller_radius="${roller_radius}"
+      roller_length="${roller_length}"/>
+
+  </xacro:macro>
+
+</robot>
+
