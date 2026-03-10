@@ -8,5 +8,4 @@ colcon build \
         --symlink-install \
         --parallel-workers 4 \
         --cmake-args "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" "-DCMAKE_EXPORT_COMPILE_COMMANDS=On" \
-        -Wall -Wextra -Wpedantic \
-        --packages-ignore robotic_arm_hardware
+        -Wall -Wextra -Wpedantic

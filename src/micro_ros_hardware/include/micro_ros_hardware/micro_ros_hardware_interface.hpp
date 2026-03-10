@@ -11,8 +11,8 @@
 #include "hardware_interface/handle.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
-#include "std_msgs/msg/float64_multi_array.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "robot_messages/msg/wheels_command.hpp"
 
 namespace micro_ros_hardware
 {
@@ -58,7 +58,7 @@ private:
   rclcpp::Node::SharedPtr node_;
 
   // Publisher : commandes vers ESP32
-  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr wheel_cmd_pub_;
+  rclcpp::Publisher<robot_messages::msg::WheelsCommand>::SharedPtr wheel_cmd_pub_;
 
   // Subscriber : encodeurs depuis ESP32
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;

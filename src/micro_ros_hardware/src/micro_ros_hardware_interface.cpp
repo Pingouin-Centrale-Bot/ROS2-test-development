@@ -36,7 +36,7 @@ namespace micro_ros_hardware
                 node_ = rclcpp::Node::make_shared("micro_ros_hardware_interface");
 
                 // Publisher → ESP32 : vitesses cibles de chaque roue
-                wheel_cmd_pub_ = node_->create_publisher<std_msgs::msg::Float64MultiArray>(
+                wheel_cmd_pub_ = node_->create_publisher<robot_messages::msg::WheelsCommand>(
                         cmd_topic_, rclcpp::QoS(10)
                 );
                 
@@ -69,8 +69,11 @@ namespace micro_ros_hardware
 
         hardware_interface::CallbackReturn MicroRosHardwareInterface::on_deactivate(const rclcpp_lifecycle::State & /*previous_state*/){
                 // Envoyer zéro à l'ESP32 avant de désactiver
-                std_msgs::msg::Float64MultiArray msg;
-                msg.data.assign(joint_names_.size(), 0.0);
+                robot_messages::msg::WheelsCommand msg;
+                msg.lb_joint = 0.f;
+                msg.rb_joint = 0.f;
+                msg.lf_joint = 0.f;
+                msg.rf_joint = 0.f;
                 wheel_cmd_pub_->publish(msg);
                 RCLCPP_INFO(rclcpp::get_logger("MicroRosHardwareInterface"), "Hardware désactivé.");
                 return hardware_interface::CallbackReturn::SUCCESS;
@@ -142,14 +145,12 @@ namespace micro_ros_hardware
 
         // write() : envoie les commandes de vitesse vers l'ESP32
         hardware_interface::return_type MicroRosHardwareInterface::write(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/){
-                std_msgs::msg::Float64MultiArray msg;
+                robot_messages::msg::WheelsCommand msg;
 
-                msg.layout.data_offset = 0;
-                msg.data.resize(joint_names_.size());
-
-                for (size_t i = 0; i < joint_names_.size(); ++i) {
-                        msg.data[i] = hw_commands_velocity_[i];
-                }
+                msg.lf_joint = hw_commands_velocity_[0];
+                msg.rf_joint = hw_commands_velocity_[1];
+                msg.lb_joint = hw_commands_velocity_[2];
+                msg.rb_joint = hw_commands_velocity_[3];
 
                 wheel_cmd_pub_->publish(msg);
 
