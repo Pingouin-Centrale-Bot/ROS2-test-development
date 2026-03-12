@@ -117,7 +117,6 @@ namespace micro_ros_hardware
 
         // read() : récupère les encodeurs de l'ESP32 → state interfaces
         hardware_interface::return_type MicroRosHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/){
-                // Spin le node pour traiter les callbacks entrants
                 rclcpp::spin_some(node_);
 
                 if (!joint_states_received_) {

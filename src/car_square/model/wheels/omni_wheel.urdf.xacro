@@ -7,8 +7,8 @@
 
     <link name="${prefix}_roller_${idx}">
       <inertial>
-        <origin xyz="0 0 0"/>
-        <mass value="0.02"/>
+        <origin rpy="1.5708 0 0"/>
+        <mass value="5"/>
         <inertia
           ixx="0.00001" iyy="0.00001" izz="0.00001"
           ixy="0" ixz="0" iyz="0"/>
@@ -32,8 +32,8 @@
 
     <link name="${prefix}_roller_neighbor_${idx}">
       <inertial>
-        <origin xyz="0 0 0"/>
-        <mass value="0.02"/>
+        <origin rpy="1.5708 0 0"/>
+        <mass value="5"/>
         <inertia
           ixx="0.00001" iyy="0.00001" izz="0.00001"
           ixy="0" ixz="0" iyz="0"/>
@@ -62,6 +62,7 @@
         xyz="${(wheel_radius - roller_radius) * cos(angle1)} ${-wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle1)}"
         rpy="${3*pi/2 - angle1} 0 1.5708"/>
       <axis xyz="0 1 0"/>
+      <dynamics damping="100.0" friction="5.0"/>
     </joint>
 
     <joint name="${prefix}_roller_neighbor_${idx}_joint" type="continuous">
@@ -71,6 +72,7 @@
         xyz="${(wheel_radius - roller_radius) * cos(angle2)} ${2*roller_radius - wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle2)}"
         rpy="${3*pi/2 - angle2} 0 1.5708"/>
       <axis xyz="0 1 0"/>
+      <dynamics damping="100.0" friction="5.0"/>
     </joint>
 
 
@@ -120,7 +122,7 @@
     <!-- moyeu -->
     <link name="${prefix}_hub">
       <inertial>
-        <origin xyz="0 0 0"/>
+        <origin rpy="1.5708 0 0"/>
         <mass value="0.5"/>
         <inertia
           ixx="0.001" iyy="0.001" izz="0.001"
@@ -150,6 +152,7 @@
       <child link="${prefix}_hub"/>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <axis xyz="0 1 0"/>
+      <dynamics damping="100.0" friction="5.0"/>
     </joint>
 
     <!-- génération des rollers -->

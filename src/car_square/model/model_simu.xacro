@@ -29,14 +29,14 @@
                         <geometry>
                         <box size="${chassis_length/8} ${chassis_width/2} ${chassis_height/4}"/>
                         </geometry>
-                        <origin xyz="${3*chassis_length/8} 0 ${1.5*chassis_offset - chassis_height/8}" rpy="0 0 0"/>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
                         <material name="green"/>
                 </visual>
         </link>
         <joint name="visual_front_joint" type="fixed">
                 <parent link="base_link"/>
                 <child link="visual_front"/>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="${3*chassis_length/8} 0 ${1.5*chassis_offset - chassis_height/8}" rpy="0 0 0"/>
         </joint>
 
         <!-- LINKS ET JOINTS DES ROUES -->
@@ -65,6 +65,35 @@
                 xyz="${-(chassis_length/2)} ${-(chassis_width/2 + wheel_width)} ${r}"
                 rpy="0 0 ${-5*pi/4}"
         />
+
+        <link name="lidar_link">
+                <visual>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="0.1" radius="0.1"/>
+                        </geometry>
+                </visual>
+                <collision name="collision">
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="0.1" radius="0.1"/>
+                        </geometry>
+                </collision>
+                <inertial>
+                        <mass value="1e-6"/>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <inertia ixx="1e-6" ixy="0" ixz="0"
+                                 iyy="1e-6" iyz="0" izz="1e-6"
+                        />
+                </inertial>
+        </link>
+
+        <joint name="lidar_joint" type="fixed">
+                        <origin xyz="0 0 ${2*chassis_offset - chassis_height/8}" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="lidar_link"/>
+                <axis xyz="0 1 0" rpy="0 0 0"/>
+        </joint>
 
         <!-- ROS2_CONTROL -->
 

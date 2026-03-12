@@ -9,9 +9,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
 
 add_executable(car_controller src/car_controller.cpp)
-ament_target_dependencies(car_controller rclcpp geometry_msgs sensor_msgs)
+ament_target_dependencies(car_controller rclcpp geometry_msgs sensor_msgs control_msgs)
 install(TARGETS car_controller DESTINATION lib/${PROJECT_NAME})
 
 install(

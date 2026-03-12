@@ -19,8 +19,8 @@ omni_wheel_drive_controller:
 
     wheel_offset: 0.7854
      
-    robot_radius: 1.84
-    wheel_radius: 0.31193181848
+    robot_radius: 2.32
+    wheel_radius: 0.29
 
     base_frame_id: base_link
     odom_frame_id: odom

@@ -49,6 +49,12 @@ def generate_launch_description():
         output="screen"
     )
 
+    lidar_bridge = launch_ros.actions.Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan'],
+    )
+
     # Gazebo publie TOUS les joints (hub + rollers) → /joint_states_gz
     gz_joint_state_bridge = launch_ros.actions.Node(
         package="ros_gz_bridge",
@@ -154,6 +160,7 @@ def generate_launch_description():
     node_list = [
         gazebo,
         clock_bridge,
+        lidar_bridge,
         gz_joint_state_bridge,
         gz_spawn_entity,
         robot_state_publisher_node,
