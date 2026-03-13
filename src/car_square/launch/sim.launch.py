@@ -6,21 +6,26 @@ import os
 
 packageName = "car_square"
 
-xacroRelativePath       = "model/model_simu.xacro"
-rvizRelativePath        = "config/config.rviz"
-ros2controlRelativePath = "config/robot_controller.yaml"
+xacroRelativePath        = "model/model_simu.xacro"
+rvizRelativePath         = "config/config.rviz"
+ros2controlRelativePath  = "config/robot_controller.yaml"
+worldRelativePath        = "config/world.sdf"
+controllerRelativeParams = "config/params.yaml"
 
 
 def generate_launch_description():
 
     # ── Paths ────────────────────────────────────────────────────────────────
-    pkgPath          = launch_ros.substitutions.FindPackageShare(package=packageName).find(packageName)
-    xacroModelPath   = os.path.join(pkgPath, xacroRelativePath)
-    rvizConfigPath   = os.path.join(pkgPath, rvizRelativePath)
-    ros2controlPath  = os.path.join(pkgPath, ros2controlRelativePath)
+    pkgPath           = launch_ros.substitutions.FindPackageShare(package=packageName).find(packageName)
+    xacroModelPath    = os.path.join(pkgPath, xacroRelativePath)
+    rvizConfigPath    = os.path.join(pkgPath, rvizRelativePath)
+    ros2controlPath   = os.path.join(pkgPath, ros2controlRelativePath)
+    worldPath         = os.path.join(pkgPath, worldRelativePath)
 
     robot_desc        = Command(['xacro ', xacroModelPath])
     robot_description = {"robot_description": robot_desc}
+
+    controller_config = os.path.join(pkgPath, controllerRelativeParams)
 
     # ── Arguments ────────────────────────────────────────────────────────────
     declared_arguments = [
@@ -37,7 +42,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             [launch_ros.substitutions.FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments=[("gz_args", " -r -v 3 empty.sdf")],
+        launch_arguments=[("gz_args", [" -r -v 3 ", worldPath])],
         condition=launch.conditions.IfCondition(gui)
     )
 
@@ -52,7 +57,7 @@ def generate_launch_description():
     lidar_bridge = launch_ros.actions.Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan'],
+        arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan']
     )
 
     # Gazebo publie TOUS les joints (hub + rollers) → /joint_states_gz
@@ -64,7 +69,7 @@ def generate_launch_description():
             "@sensor_msgs/msg/JointState[gz.msgs.Model"
         ],
         remappings=[
-            ("/world/empty/model/robot_system_position/joint_state", "/joint_states_gz")
+            ("/world/simple_world/model/robot_system_position/joint_state", "/joint_states_gz")
         ],
         output="screen"
     )
@@ -91,6 +96,11 @@ def generate_launch_description():
             "use_sim_time": True,
             "publish_frequency": 50.0
         }]
+    )
+
+    delayed_rsp = launch.actions.TimerAction(
+        period=2.0,
+        actions=[robot_state_publisher_node]
     )
 
     # joint_state_broadcaster publie les 4 roues → /joint_states_ros2control
@@ -128,7 +138,8 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2",
         output="screen",
-        arguments=["-d", rvizConfigPath]
+        arguments=["-d", rvizConfigPath],
+        parameters=[{"use_sim_time": True}] 
     )
 
     # ── Séquençage : controllers + merger démarrent après le spawn ───────────
@@ -145,7 +156,8 @@ def generate_launch_description():
 
     car_controller = launch_ros.actions.Node(
         package="car_square",
-        executable="car_controller"
+        executable="car_controller",
+        parameters = [controller_config]
     )
 
     joy_node = launch_ros.actions.Node(
@@ -163,7 +175,7 @@ def generate_launch_description():
         lidar_bridge,
         gz_joint_state_bridge,
         gz_spawn_entity,
-        robot_state_publisher_node,
+        delayed_rsp,
         rviz_node,
 
         car_controller,

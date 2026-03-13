@@ -13,8 +13,8 @@ twist:
 ros2 topic pub /omni_wheel_drive_controller/cmd_vel geometry_msgs/msg/TwistStamped "
 twist:
   linear:
-    x: 0.2
-    y: 0.0
+    x: 1
+    y: 1
     z: 0.0
   angular:
     x: 0.0

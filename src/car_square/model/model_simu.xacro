@@ -36,7 +36,7 @@
         <joint name="visual_front_joint" type="fixed">
                 <parent link="base_link"/>
                 <child link="visual_front"/>
-                <origin xyz="${3*chassis_length/8} 0 ${1.5*chassis_offset - chassis_height/8}" rpy="0 0 0"/>
+                <origin xyz="${chassis_length/2} 0 ${chassis_offset}" rpy="0 1.571 0"/>
         </joint>
 
         <!-- LINKS ET JOINTS DES ROUES -->
@@ -66,30 +66,50 @@
                 rpy="0 0 ${-5*pi/4}"
         />
 
-        <link name="lidar_link">
+        <!--  -->
+        <link name="mat_link">
                 <visual>
                         <origin xyz="0 0 0" rpy="0 0 0"/>
                         <geometry>
-                                <cylinder length="0.1" radius="0.1"/>
+                                <cylinder length="${mat_length}" radius="${mat_radius}"/>
                         </geometry>
+                        <material name="red"/>
                 </visual>
                 <collision name="collision">
                         <origin xyz="0 0 0" rpy="0 0 0"/>
                         <geometry>
-                                <cylinder length="0.1" radius="0.1"/>
+                                <cylinder length="${mat_length}" radius="${mat_radius}"/>
                         </geometry>
                 </collision>
-                <inertial>
-                        <mass value="1e-6"/>
+        </link>
+
+        <joint name="mat_joint" type="fixed">
+                        <origin xyz="0 0 ${chassis_offset - chassis_height/4 + mat_length/2}" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="mat_link"/>
+                <axis xyz="0 1 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- LINKS ET JOINTS DU LIDAR -->
+
+        <link name="lidar_link">
+                <visual>
                         <origin xyz="0 0 0" rpy="0 0 0"/>
-                        <inertia ixx="1e-6" ixy="0" ixz="0"
-                                 iyy="1e-6" iyz="0" izz="1e-6"
-                        />
-                </inertial>
+                        <geometry>
+                                <cylinder length="${lidar_length}" radius="${lidar_radius}"/>
+                        </geometry>
+                        <material name="green"/>
+                </visual>
+                <collision name="collision">
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="${lidar_length}" radius="${lidar_radius}"/>
+                        </geometry>
+                </collision>
         </link>
 
         <joint name="lidar_joint" type="fixed">
-                        <origin xyz="0 0 ${2*chassis_offset - chassis_height/8}" rpy="0 0 0"/>
+                        <origin xyz="0 0 ${chassis_offset - chassis_height/4 + mat_length + lidar_length/2}" rpy="0 0 0"/>
                 <parent link="base_link"/>
                 <child link="lidar_link"/>
                 <axis xyz="0 1 0" rpy="0 0 0"/>

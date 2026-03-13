@@ -16,7 +16,7 @@ ament_target_dependencies(car_controller rclcpp geometry_msgs sensor_msgs contro
 install(TARGETS car_controller DESTINATION lib/${PROJECT_NAME})
 
 install(
-  DIRECTORY launch model config 
+  DIRECTORY launch model config meshes
   DESTINATION share/${PROJECT_NAME}
 )
 

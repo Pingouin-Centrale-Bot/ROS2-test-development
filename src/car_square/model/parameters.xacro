@@ -29,16 +29,19 @@
 
 
 <xacro:property name="r" value="${0.1*SCALE_FACTOR}" />
-<xacro:property name="wheel_radius" value="${0.06*SCALE_FACTOR}"/>
-<xacro:property name="wheel_width" value="${0.02*SCALE_FACTOR}"/>
+<xacro:property name="wheel_radius" value="${0.065*SCALE_FACTOR}"/>
+<xacro:property name="wheel_width" value="${0.03*SCALE_FACTOR}"/>
 
 <xacro:property name="roller_radius" value="${0.01*SCALE_FACTOR}"/>
 <xacro:property name="roller_length" value="${0.03*SCALE_FACTOR}"/>
-<xacro:property name="roller_count" value="6"/>
+<xacro:property name="roller_count" value="4"/>
 
 
-<xacro:property name="friction_coefficient" value="100"/>
+<xacro:property name="mat_radius" value="${0.2*SCALE_FACTOR}"/>
+<xacro:property name="mat_length" value="${0.6*SCALE_FACTOR}"/>
 
+<xacro:property name="lidar_radius" value="${0.02*SCALE_FACTOR}"/>
+<xacro:property name="lidar_length" value="${0.02*SCALE_FACTOR}"/>
 
 <material name="blue">
         <color rgba="0 0 1 1"/>

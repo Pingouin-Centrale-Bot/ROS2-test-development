@@ -2,58 +2,87 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:include filename="$(find car_square)/model/parameters.xacro"/>
+
   <!-- ========== MACRO ROLLER ========== -->
   <xacro:macro name="roller" params="prefix parent idx angle1 angle2 wheel_radius wheel_width roller_radius roller_length">
 
     <link name="${prefix}_roller_${idx}">
       <inertial>
-        <origin rpy="1.5708 0 0"/>
-        <mass value="5"/>
-        <inertia
-          ixx="0.00001" iyy="0.00001" izz="0.00001"
-          ixy="0" ixz="0" iyz="0"/>
+        <mass value="9.1"/>
+        <inertia ixx="0.0812" iyy="0.0812" izz="0.0473" ixy="0" ixz="0" iyz="0"/>
       </inertial>
-
       <collision>
-        <origin rpy="1.5708 0 0"/>
+        <origin xyz="0 0 0" rpy="1.571 0 0"/>
         <geometry>
-          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+          <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
       </collision>
-
       <visual>
-        <origin rpy="1.5708 0 0"/>
+        <origin xyz="0 0 0" rpy="1.571 0 0"/>
         <geometry>
-          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+          <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
-        <material name="white" />
+        <material name="white"/>
       </visual>
     </link>
+
+    <gazebo reference="${prefix}_roller_${idx}">
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e+5</kp>
+            <kd>100.0</kd>
+            <max_vel>0.01</max_vel>
+            <min_depth>0</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
 
     <link name="${prefix}_roller_neighbor_${idx}">
       <inertial>
-        <origin rpy="1.5708 0 0"/>
-        <mass value="5"/>
-        <inertia
-          ixx="0.00001" iyy="0.00001" izz="0.00001"
-          ixy="0" ixz="0" iyz="0"/>
+        <mass value="9.1"/>
+        <inertia ixx="0.0812" iyy="0.0812" izz="0.0473" ixy="0" ixz="0" iyz="0"/>
       </inertial>
-
       <collision>
-        <origin rpy="1.5708 0 0"/>
+        <origin xyz="0 0 0" rpy="1.571 0 0"/>
         <geometry>
-          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+          <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
       </collision>
-
       <visual>
-        <origin rpy="1.5708 0 0"/>
+        <origin xyz="0 0 0" rpy="1.571 0 0"/>
         <geometry>
-          <cylinder radius="${roller_radius}" length="${roller_length}"/>
+          <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
-        <material name="white" />
+        <material name="white"/>
       </visual>
     </link>
+
+    <gazebo reference="${prefix}_roller_neighbor_${idx}">
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e+5</kp>
+            <kd>100.0</kd>
+            <max_vel>0.01</max_vel>
+            <min_depth>0</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
 
     <joint name="${prefix}_roller_${idx}_joint" type="continuous">
       <parent link="${parent}"/>
@@ -62,19 +91,18 @@
         xyz="${(wheel_radius - roller_radius) * cos(angle1)} ${-wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle1)}"
         rpy="${3*pi/2 - angle1} 0 1.5708"/>
       <axis xyz="0 1 0"/>
-      <dynamics damping="100.0" friction="5.0"/>
+      <dynamics damping="0.01" friction="0.0"/>
     </joint>
 
     <joint name="${prefix}_roller_neighbor_${idx}_joint" type="continuous">
       <parent link="${parent}"/>
       <child link="${prefix}_roller_neighbor_${idx}"/>
       <origin
-        xyz="${(wheel_radius - roller_radius) * cos(angle2)} ${2*roller_radius - wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle2)}"
+        xyz="${(wheel_radius - roller_radius) * cos(angle2)} ${wheel_width/2} ${(wheel_radius - roller_radius) * sin(angle2)}"
         rpy="${3*pi/2 - angle2} 0 1.5708"/>
       <axis xyz="0 1 0"/>
-      <dynamics damping="100.0" friction="5.0"/>
+      <dynamics damping="0.01" friction="0.0"/>
     </joint>
-
 
   </xacro:macro>
 
@@ -84,89 +112,82 @@
                params="prefix parent idx count wheel_radius wheel_width roller_radius roller_length">
 
     <xacro:if value="${idx &lt; count}">
-      <xacro:property name="angle1"
-                      value="${2 * pi * idx / count}"/>
-      <xacro:property name="angle2"
-                      value="${2 * pi * idx / count + pi / count}" />
+      <xacro:property name="angle1" value="${2 * pi * idx / count}"/>
+      <xacro:property name="angle2" value="${2 * pi * idx / count + pi / count}"/>
 
       <xacro:roller
-        prefix="${prefix}"
-        parent="${parent}"
-        idx="${idx}"
-        angle1="${angle1}"
-        angle2="${angle2}"
-        wheel_radius="${wheel_radius}"
-        wheel_width="${wheel_width}"
-        roller_radius="${roller_radius}"
-        roller_length="${roller_length}"/>
+        prefix="${prefix}" parent="${parent}" idx="${idx}"
+        angle1="${angle1}" angle2="${angle2}"
+        wheel_radius="${wheel_radius}" wheel_width="${wheel_width}"
+        roller_radius="${roller_radius}" roller_length="${roller_length}"/>
 
-      <!-- appel récursif -->
       <xacro:roller_loop
-        prefix="${prefix}"
-        parent="${parent}"
-        idx="${idx + 1}"
-        count="${count}"
-        wheel_radius="${wheel_radius}"
-        wheel_width="${wheel_width}"
-        roller_radius="${roller_radius}"
-        roller_length="${roller_length}"/>
+        prefix="${prefix}" parent="${parent}" idx="${idx + 1}" count="${count}"
+        wheel_radius="${wheel_radius}" wheel_width="${wheel_width}"
+        roller_radius="${roller_radius}" roller_length="${roller_length}"/>
     </xacro:if>
 
   </xacro:macro>
 
 
   <!-- ========== OMNI WHEEL COMPLETE ========== -->
-  <xacro:macro name="omni_wheel"
-               params="prefix parent xyz rpy">
+  <xacro:macro name="omni_wheel" params="prefix parent xyz rpy">
 
-    <!-- moyeu -->
     <link name="${prefix}_hub">
       <inertial>
         <origin rpy="1.5708 0 0"/>
-        <mass value="0.5"/>
-        <inertia
-          ixx="0.001" iyy="0.001" izz="0.001"
-          ixy="0.0" ixz="0.0" iyz="0.0"/>
+        <mass value="66.86064"/>
+        <inertia ixx="3.009" iyy="2.1239" izz="2.1239" ixy="0.0" ixz="0.0" iyz="0.0"/>
       </inertial>
-
       <visual>
+        <origin xyz="0 0 0" rpy="0 0 1.571"/>
         <geometry>
-          <cylinder radius="${7*wheel_radius/8}" length="${3*wheel_width/2}"/>
+          <mesh filename="file://$(find car_square)/meshes/rim.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
         <material name="blue"/>
-        <origin rpy="1.5708 0 0"/>
       </visual>
-
       <collision>
+        <origin xyz="0 0 0" rpy="0 0 1.571"/>
         <geometry>
-          <cylinder radius="${7*wheel_radius/8}" length="${3*wheel_width/2}"/>
+          <mesh filename="file://$(find car_square)/meshes/rim.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
-        <material name="blue"/>
-        <origin rpy="1.5708 0 0"/>
       </collision>
     </link>
 
+    <gazebo reference="${prefix}_hub">
+      <surface>
+        <friction>
+          <ode>
+            <mu>1.0</mu>
+            <mu2>1.0</mu2>
+            <fdir1>0 0 0</fdir1>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e+5</kp>
+            <kd>100.0</kd>
+            <max_vel>0.01</max_vel>
+            <min_depth>0</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
 
     <joint name="${prefix}_joint" type="continuous">
       <parent link="${parent}"/>
       <child link="${prefix}_hub"/>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <axis xyz="0 1 0"/>
-      <dynamics damping="100.0" friction="5.0"/>
+      <dynamics damping="0.0" friction="0.0"/>
     </joint>
 
-    <!-- génération des rollers -->
     <xacro:roller_loop
-      prefix="${prefix}"
-      parent="${prefix}_hub"
-      idx="0"
-      count="${roller_count}"
-      wheel_radius="${wheel_radius}"
-      wheel_width="${wheel_width}"
-      roller_radius="${roller_radius}"
-      roller_length="${roller_length}"/>
+      prefix="${prefix}" parent="${prefix}_hub"
+      idx="0" count="${roller_count}"
+      wheel_radius="${wheel_radius}" wheel_width="${wheel_width}"
+      roller_radius="${roller_radius}" roller_length="${roller_length}"/>
 
   </xacro:macro>
 
 </robot>
-

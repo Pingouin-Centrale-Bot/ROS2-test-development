@@ -24,21 +24,36 @@ class CarController : public rclcpp::Node {
                                 "/dynamic_joint_states", 10,
                                 std::bind(&CarController::dynamic_joint_states_callback, this, std::placeholders::_1)
                         );
+
                         last_time_ = this->now();
+
+                        this->declare_parameter<double>("speed");
+                        speed = this->get_parameter("speed").as_double();
 
                 }
 
         private: 
-        
                 void joy_callback(const sensor_msgs::msg::Joy::SharedPtr joy) {
                         auto msg = geometry_msgs::msg::TwistStamped();
 
                         msg.header.stamp = this->now();
                         msg.header.frame_id = "base_link";
 
-                        msg.twist.linear.x  = -joy->axes[0] * 1.0;
-                        msg.twist.linear.y  = -joy->axes[1] * 1.0;
-                        msg.twist.angular.z = joy->axes[3] * 1.0;
+                        double raw_x = -joy->axes[0];
+                        double raw_y = -joy->axes[1];
+                        double raw_angular = joy->axes[3];
+
+                        // Calcul de la norme
+                        double norm = std::hypot(raw_x, raw_y);
+
+                        if (norm > 1.0) { 
+                                raw_x /= norm;
+                                raw_y /= norm;
+                        }
+
+                        msg.twist.linear.x  = raw_x * speed;
+                        msg.twist.linear.y  = raw_y * speed;
+                        msg.twist.angular.z = raw_angular * speed / 3;
 
                         cmd_vel_pub->publish(msg);
                 }
@@ -78,9 +93,11 @@ class CarController : public rclcpp::Node {
                         y_     += delta_y;
                         theta_ += delta_theta;
 
+                        /*
                         RCLCPP_INFO(this->get_logger(), "lf_vel=%.3f rf_vel=%.3f rb_vel=%.3f lb_vel=%.3f", lf_vel, rf_vel, rb_vel, lb_vel);
                         RCLCPP_INFO(this->get_logger(), "dx=%.3f dy=%.3f dtheta=%.3f", delta_x, delta_y, delta_theta);
                         RCLCPP_INFO(this->get_logger(), "x=%.3f y=%.3f theta=%.3f", x_, y_, theta_);
+                        */
                 }
 
                 rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub;
@@ -91,6 +108,8 @@ class CarController : public rclcpp::Node {
                 rclcpp::Time last_time_;
                 const double WHEEL_RADIUS = 0.29;
                 const double ROBOT_RADIUS = 2.32;
+
+                double speed;
 
 };
 
