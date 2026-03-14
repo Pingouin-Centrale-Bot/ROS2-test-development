@@ -44,25 +44,25 @@
         <xacro:omni_wheel
                 prefix="lf"
                 parent="base_link"
-                xyz="${chassis_length/2} ${chassis_width/2 + wheel_width} ${r}"
+                xyz="${chassis_length/2} ${chassis_width/2} ${r}"
                 rpy="0 0 ${-pi/4}"
         />
         <xacro:omni_wheel
                 prefix="rf"
                 parent="base_link"
-                xyz="${chassis_length/2} ${-(chassis_width/2 + wheel_width)} ${r}"
+                xyz="${chassis_length/2} ${-(chassis_width/2)} ${r}"
                 rpy="0 0 ${5*pi/4}"
         />
         <xacro:omni_wheel
                 prefix="lb"
                 parent="base_link"
-                xyz="${-(chassis_length/2)} ${chassis_width/2 + wheel_width} ${r}"
+                xyz="${-(chassis_length/2)} ${chassis_width/2} ${r}"
                 rpy="0 0 ${pi/4}"
         />
         <xacro:omni_wheel
                 prefix="rb"
                 parent="base_link"
-                xyz="${-(chassis_length/2)} ${-(chassis_width/2 + wheel_width)} ${r}"
+                xyz="${-(chassis_length/2)} ${-(chassis_width/2)} ${r}"
                 rpy="0 0 ${-5*pi/4}"
         />
 

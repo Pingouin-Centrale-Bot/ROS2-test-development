@@ -1,3 +1,7 @@
 car_controller:
   ros__parameters:
     speed: 1.0
+    Kp: 5.0
+    wheel_radius: 0.315
+    robot_radius: 1.750
+    accel: 1.0

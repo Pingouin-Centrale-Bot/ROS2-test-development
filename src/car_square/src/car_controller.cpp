@@ -34,12 +34,21 @@ class CarController : public rclcpp::Node {
                         last_time_ = this->now();
 
                         this->declare_parameter<double>("speed");
+                        this->declare_parameter<double>("Kp");
+                        this->declare_parameter<double>("wheel_radius");
+                        this->declare_parameter<double>("robot_radius");
+                        this->declare_parameter<double>("accel");
                         speed = this->get_parameter("speed").as_double();
+                        Kp = this->get_parameter("Kp").as_double();
+                        wheel_radius = this->get_parameter("wheel_radius").as_double();
+                        robot_radius = this->get_parameter("robot_radius").as_double();
+                        accel = this->get_parameter("accel").as_double();
 
                 }
 
         private: 
                 void joy_callback(const sensor_msgs::msg::Joy::SharedPtr joy) {
+
                         auto msg = geometry_msgs::msg::TwistStamped();
 
                         msg.header.stamp = this->now();
@@ -49,17 +58,31 @@ class CarController : public rclcpp::Node {
                         double raw_y = -joy->axes[1];
                         double raw_angular = joy->axes[3];
 
-                        // Calcul de la norme
                         double norm = std::hypot(raw_x, raw_y);
 
-                        if (norm > 1.0) { 
+                        if (norm > 1.0) {
                                 raw_x /= norm;
                                 raw_y /= norm;
                         }
 
-                        msg.twist.linear.x  = raw_x * speed;
-                        msg.twist.linear.y  = raw_y * speed;
-                        msg.twist.angular.z = raw_angular * speed;
+                        double target_x = raw_x * speed;
+                        double target_y = raw_y * speed;
+                        double target_w = raw_angular * speed;
+
+                        auto step = [](double current, double target, double max_step) {
+                                double diff = target - current;
+                                if (diff > max_step) diff = max_step;
+                                if (diff < -max_step) diff = -max_step;
+                                return current + diff;
+                        };
+
+                        vx = step(vx, target_x, accel);
+                        vy = step(vy, target_y, accel);
+                        wz = step(wz, target_w, accel);
+
+                        msg.twist.linear.x = vx;
+                        msg.twist.linear.y = vy;
+                        msg.twist.angular.z = wz;
 
                         cmd_vel_pub->publish(msg);
                 }
@@ -70,7 +93,18 @@ class CarController : public rclcpp::Node {
                         theta_target = msg->theta_target;
                 }
 
+                double ramp(double current, double target, double max_step)
+                {
+                        double diff = target - current;
+
+                        if (diff > max_step) diff = max_step;
+                        if (diff < -max_step) diff = -max_step;
+
+                        return current + diff;
+                }
+
                 void dynamic_joint_states_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg){
+                        
                         // Position (rad) - values[0]
                         double lf_pos = msg->interface_values[0].values[0];
                         double rf_pos = msg->interface_values[1].values[0];
@@ -92,9 +126,9 @@ class CarController : public rclcpp::Node {
 
                         // Forward kinematics omni 4 roues
                         // vx, vy en m/s dans le repère base_link
-                        double vx    = (lf_vel - rf_vel + rb_vel - lb_vel) * WHEEL_RADIUS / 4.0;
-                        double vy = (lf_vel + rf_vel - rb_vel - lb_vel) * WHEEL_RADIUS / 4.0;
-                        double omega = (lf_vel + rf_vel + rb_vel + lb_vel) * WHEEL_RADIUS / (4.0 * ROBOT_RADIUS);
+                        double vx    = (lf_vel - rf_vel + rb_vel - lb_vel) * wheel_radius / 4.0;
+                        double vy = (lf_vel + rf_vel - rb_vel - lb_vel) * wheel_radius / 4.0;
+                        double omega = (lf_vel + rf_vel + rb_vel + lb_vel) * wheel_radius / (4.0 * robot_radius);
 
                         // Intégration dans le repère world (odom)
                         double delta_x     = (vx * cos(theta_) - vy * sin(theta_)) * dt;
@@ -113,15 +147,23 @@ class CarController : public rclcpp::Node {
                         double y_error_robot = -x_error * sin(theta_) - y_error * cos(theta_);
 
                         RCLCPP_INFO(this->get_logger(), "x=%f y=%f", x_, y_);
-                        
+
                         auto msg_input = geometry_msgs::msg::TwistStamped();
 
                         msg_input.header.stamp = this->now();
                         msg_input.header.frame_id = "base_link";
 
-                        msg_input.twist.linear.x  = std::clamp(Kp * y_error_robot, -speed, speed);
-                        msg_input.twist.linear.y  = std::clamp(Kp * x_error_robot, -speed, speed);
-                        msg_input.twist.angular.z = std::clamp(Kp * 0.2 * theta_error, -speed, speed);
+                        double target_vx = std::clamp(Kp * y_error_robot, -speed, speed);
+                        double target_vy = std::clamp(Kp * x_error_robot, -speed, speed);
+                        double target_wz = std::clamp(Kp * 0.2 * theta_error, -speed, speed);
+
+                        vx = ramp(vx, target_vx, accel);
+                        vy = ramp(vy, target_vy, accel);
+                        wz = ramp(wz, target_wz, accel);
+
+                        msg_input.twist.linear.x  = vx;
+                        msg_input.twist.linear.y  = vy;
+                        msg_input.twist.angular.z = wz;
 
                         cmd_vel_pub->publish(msg_input);
                 }
@@ -133,17 +175,21 @@ class CarController : public rclcpp::Node {
 
                 double x_ = 0.0, y_ = 0.0, theta_ = 0.0;
                 rclcpp::Time last_time_;
-                const double WHEEL_RADIUS = 0.36;
-                const double ROBOT_RADIUS = 1.750;
 
-                double speed;
+                double vx = 0.0;
+                double vy = 0.0;
+                double wz = 0.0;
 
 
                 double x_target;
                 double y_target;
                 double theta_target;
 
-                double Kp = 5;
+                double speed;
+                double accel;
+                double Kp;
+                double wheel_radius;
+                double robot_radius;
 
 };
 
