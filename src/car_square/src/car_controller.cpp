@@ -2,6 +2,7 @@
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "sensor_msgs/msg/joy.hpp"
 #include "control_msgs/msg/dynamic_joint_state.hpp"
+#include "robot_messages/msg/target_position.hpp"
 #include <cmath>
 
 using namespace std::chrono_literals;
@@ -23,6 +24,11 @@ class CarController : public rclcpp::Node {
                         dynamic_joint_states_sub = this->create_subscription<control_msgs::msg::DynamicJointState>(
                                 "/dynamic_joint_states", 10,
                                 std::bind(&CarController::dynamic_joint_states_callback, this, std::placeholders::_1)
+                        );
+
+                        position_sub = this->create_subscription<robot_messages::msg::TargetPosition>(
+                                "/position_target", 10,
+                                std::bind(&CarController::position_target_callback, this, std::placeholders::_1)
                         );
 
                         last_time_ = this->now();
@@ -53,9 +59,15 @@ class CarController : public rclcpp::Node {
 
                         msg.twist.linear.x  = raw_x * speed;
                         msg.twist.linear.y  = raw_y * speed;
-                        msg.twist.angular.z = raw_angular * speed / 3;
+                        msg.twist.angular.z = raw_angular * speed;
 
                         cmd_vel_pub->publish(msg);
+                }
+
+                void position_target_callback(const robot_messages::msg::TargetPosition::SharedPtr msg){
+                        x_target = msg->x_target;
+                        y_target = msg->y_target;
+                        theta_target = msg->theta_target;
                 }
 
                 void dynamic_joint_states_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg){
@@ -91,25 +103,47 @@ class CarController : public rclcpp::Node {
 
                         x_     += delta_x;
                         y_     += delta_y;
-                        theta_ += delta_theta;
+                        theta_ += delta_theta;                        
 
-                        /*
-                        RCLCPP_INFO(this->get_logger(), "lf_vel=%.3f rf_vel=%.3f rb_vel=%.3f lb_vel=%.3f", lf_vel, rf_vel, rb_vel, lb_vel);
-                        RCLCPP_INFO(this->get_logger(), "dx=%.3f dy=%.3f dtheta=%.3f", delta_x, delta_y, delta_theta);
-                        RCLCPP_INFO(this->get_logger(), "x=%.3f y=%.3f theta=%.3f", x_, y_, theta_);
-                        */
+                        double x_error = x_target - x_;
+                        double y_error = y_target - y_;
+                        double theta_error = theta_ - theta_target;
+
+                        double x_error_robot = -x_error * cos(theta_) + y_error * sin(theta_);
+                        double y_error_robot = -x_error * sin(theta_) - y_error * cos(theta_);
+
+                        RCLCPP_INFO(this->get_logger(), "x=%f y=%f", x_, y_);
+                        
+                        auto msg_input = geometry_msgs::msg::TwistStamped();
+
+                        msg_input.header.stamp = this->now();
+                        msg_input.header.frame_id = "base_link";
+
+                        msg_input.twist.linear.x  = std::clamp(Kp * y_error_robot, -speed, speed);
+                        msg_input.twist.linear.y  = std::clamp(Kp * x_error_robot, -speed, speed);
+                        msg_input.twist.angular.z = std::clamp(Kp * 0.2 * theta_error, -speed, speed);
+
+                        cmd_vel_pub->publish(msg_input);
                 }
 
                 rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub;
                 rclcpp::Subscription<control_msgs::msg::DynamicJointState>::SharedPtr dynamic_joint_states_sub;
                 rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr cmd_vel_pub;
+                rclcpp::Subscription<robot_messages::msg::TargetPosition>::SharedPtr position_sub;
 
                 double x_ = 0.0, y_ = 0.0, theta_ = 0.0;
                 rclcpp::Time last_time_;
-                const double WHEEL_RADIUS = 0.29;
-                const double ROBOT_RADIUS = 2.32;
+                const double WHEEL_RADIUS = 0.36;
+                const double ROBOT_RADIUS = 1.750;
 
                 double speed;
+
+
+                double x_target;
+                double y_target;
+                double theta_target;
+
+                double Kp = 5;
 
 };
 

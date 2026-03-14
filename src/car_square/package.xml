@@ -28,6 +28,7 @@
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>control_msgs</depend>
+  <depend>robot_messages</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
