@@ -14,7 +14,7 @@
 
                 <collision>
                         <geometry>
-                        <box size="0.3 0.25 0.05"/>
+                        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
                         </geometry>
                         <origin xyz="0 0 ${chassis_offset}" rpy="0 0 0"/>
                 </collision>
@@ -22,32 +22,96 @@
                 <xacro:chassis_inertia />
         </link>
 
+        <link name="visual_front">
+                <visual>
+                        <geometry>
+                                <box size="${chassis_length/8} ${chassis_width/2} ${chassis_height/4}"/>
+                        </geometry>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <material name="green"/>
+                </visual>
+        </link>
+        <joint name="visual_front_joint" type="fixed">
+                <parent link="base_link"/>
+                <child link="visual_front"/>
+                <origin xyz="${chassis_length/2} 0 ${chassis_offset}" rpy="0 1.571 0"/>
+        </joint>
+
         <!-- LINKS ET JOINTS DES ROUES -->
 
         <xacro:omni_wheel
                 prefix="lf"
                 parent="base_link"
-                xyz="${chassis_length/2} ${chassis_width/2 + wheel_width} ${r}"
+                xyz="${chassis_length/2 + wheel_offset} ${chassis_width/2 + wheel_offset} ${r}"
                 rpy="0 0 ${-pi/4}"
         />
         <xacro:omni_wheel
                 prefix="rf"
                 parent="base_link"
-                xyz="${chassis_length/2} ${-(chassis_width/2 + wheel_width)} ${r}"
+                xyz="${chassis_length/2 + wheel_offset} ${-(chassis_width/2 + wheel_offset)} ${r}"
                 rpy="0 0 ${5*pi/4}"
         />
         <xacro:omni_wheel
                 prefix="lb"
                 parent="base_link"
-                xyz="${-(chassis_length/2)} ${chassis_width/2 + wheel_width} ${r}"
+                xyz="${-(chassis_length/2 + wheel_offset)} ${chassis_width/2 + wheel_offset} ${r}"
                 rpy="0 0 ${pi/4}"
         />
         <xacro:omni_wheel
                 prefix="rb"
                 parent="base_link"
-                xyz="${-(chassis_length/2)} ${-(chassis_width/2 + wheel_width)} ${r}"
+                xyz="${-(chassis_length/2 + wheel_offset)} ${-(chassis_width/2 + wheel_offset)} ${r}"
                 rpy="0 0 ${-5*pi/4}"
         />
+
+        <!--  -->
+        <link name="mat_link">
+                <visual>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="${mat_length}" radius="${mat_radius}"/>
+                        </geometry>
+                        <material name="red"/>
+                </visual>
+                <collision name="collision">
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="${mat_length}" radius="${mat_radius}"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <joint name="mat_joint" type="fixed">
+                        <origin xyz="0 0 ${chassis_offset - chassis_height/4 + mat_length/2}" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="mat_link"/>
+                <axis xyz="0 1 0" rpy="0 0 0"/>
+        </joint>
+
+        <!-- LINKS ET JOINTS DU LIDAR -->
+
+        <link name="lidar_link">
+                <visual>
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="${lidar_length}" radius="${lidar_radius}"/>
+                        </geometry>
+                        <material name="green"/>
+                </visual>
+                <collision name="collision">
+                        <origin xyz="0 0 0" rpy="0 0 0"/>
+                        <geometry>
+                                <cylinder length="${lidar_length}" radius="${lidar_radius}"/>
+                        </geometry>
+                </collision>
+        </link>
+
+        <joint name="lidar_joint" type="fixed">
+                        <origin xyz="0 0 ${chassis_offset - chassis_height/4 + mat_length + lidar_length/2}" rpy="0 0 0"/>
+                <parent link="base_link"/>
+                <child link="lidar_link"/>
+                <axis xyz="0 1 0" rpy="0 0 0"/>
+        </joint>
 
         <!-- ROS2_CONTROL -->
 
