@@ -166,12 +166,6 @@ def generate_launch_description():
         }]
     )
 
-    roller_mimic_node = launch_ros.actions.Node(
-        package="car_square",
-        executable="roller_mimic_node",
-        output="screen"
-    )
-
     # ── Description finale ───────────────────────────────────────────────────
     node_list = [
         gazebo,
@@ -183,7 +177,6 @@ def generate_launch_description():
         rviz_node,
 
         car_controller,
-        roller_mimic_node,
 
         post_spawn
     ]
