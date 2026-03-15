@@ -4,9 +4,11 @@ from launch_ros.parameter_descriptions import ParameterValue
 import launch_ros
 import os
 
-packageName             = "car_square"
-xacroRelativePath       = "model/model.xacro"
-ros2controlRelativePath = "config/robot_controller.yaml"
+packageName              = "car_square"
+
+xacroRelativePath        = "model/model.xacro"
+ros2controlRelativePath  = "config/robot_controller.yaml"
+controllerRelativeParams = "config/params.yaml"
 
 def generate_launch_description():
 
@@ -18,6 +20,7 @@ def generate_launch_description():
     # ── Fix : ParameterValue force le type string pour xacro ─────────────────
     robot_desc        = ParameterValue(Command(['xacro ', xacroModelPath]), value_type=str)
     robot_description = {"robot_description": robot_desc}
+    controller_config = os.path.join(pkgPath, controllerRelativeParams)
 
     # ── ros2_control_node ─────────────────────────────────────────────────────
     ros2_control_node = launch_ros.actions.Node(
@@ -55,7 +58,8 @@ def generate_launch_description():
 
     car_controller = launch_ros.actions.Node(
         package="car_square",
-        executable="car_controller"
+        executable="car_controller",
+        parameters = [controller_config]
     )
 
     joy_node = launch_ros.actions.Node(
