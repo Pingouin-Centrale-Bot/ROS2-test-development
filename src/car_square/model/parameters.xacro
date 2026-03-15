@@ -11,6 +11,7 @@
 <xacro:property name="chassis_width" value="${0.5*SCALE_FACTOR}" />
 <xacro:property name="chassis_height" value="${0.1*SCALE_FACTOR}" />
 <xacro:property name="chassis_offset" value="${0.15*SCALE_FACTOR}" />
+<xacro:property name="wheel_offset" value="${0.04*SCALE_FACTOR}" />
 
 <xacro:property name="chassis_density" value="271.0"/>
 <xacro:property name="chassis_mass" value="${chassis_density * (chassis_length * chassis_width * chassis_height)}"/>

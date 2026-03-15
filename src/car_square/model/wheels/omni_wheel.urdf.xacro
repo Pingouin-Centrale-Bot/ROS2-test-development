@@ -16,6 +16,7 @@
         <geometry>
           <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
+        <contact_coefficients mu="1.0" kp="0.0" kd="1000.0" />
       </collision>
       <visual>
         <origin xyz="0 0 0" rpy="1.571 0 0"/>
@@ -25,16 +26,6 @@
         <material name="white"/>
       </visual>
     </link>
-
-    <gazebo reference="${prefix}_roller_${idx}">
-      <mu>5</mu>
-      <mu2>5</mu2>
-      <slip1>0</slip1>
-      <slip2>0</slip2>
-      <kp>5e5</kp>
-      <kd>50</kd>
-      <material>Gazebo/Grey</material>
-    </gazebo>
 
     <link name="${prefix}_roller_neighbor_${idx}">
       <inertial>
@@ -46,6 +37,7 @@
         <geometry>
           <mesh filename="file://$(find car_square)/meshes/roller.stl" scale="${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385} ${wheel_radius*61.5384615385}"/>
         </geometry>
+        <contact_coefficients mu="1.0" kp="0.0" kd="1000.0" />
       </collision>
       <visual>
         <origin xyz="0 0 0" rpy="1.571 0 0"/>
@@ -56,16 +48,6 @@
       </visual>
     </link>
 
-    <gazebo reference="${prefix}_roller_neighbor_${idx}">
-      <mu>5</mu>
-      <mu2>5</mu2>
-      <slip1>0</slip1>
-      <slip2>0</slip2>
-      <kp>5e5</kp>
-      <kd>50</kd>
-      <material>Gazebo/Grey</material>
-    </gazebo>
-
     <joint name="${prefix}_roller_${idx}_joint" type="continuous">
       <parent link="${parent}"/>
       <child link="${prefix}_roller_${idx}"/>
@@ -74,6 +56,7 @@
         rpy="${3*pi/2 - angle1} 0 1.5708"/>
       <axis xyz="0 1 0"/>
       <dynamics damping="5.0" friction="1.0"/>
+      <limit effort="1.0" velocity="10"/>
     </joint>
 
     <joint name="${prefix}_roller_neighbor_${idx}_joint" type="continuous">
@@ -84,6 +67,7 @@
         rpy="${3*pi/2 - angle2} 0 1.5708"/>
       <axis xyz="0 1 0"/>
       <dynamics damping="5.0" friction="1.0"/>
+      <limit effort="1.0" velocity="10"/>
     </joint>
 
   </xacro:macro>
@@ -136,29 +120,9 @@
       </collision>
     </link>
 
-    <gazebo reference="${prefix}_hub">
-      <surface>
-        <friction>
-          <ode>
-            <mu>1.0</mu>
-            <mu2>1.0</mu2>
-            <fdir1>0 0 0</fdir1>
-          </ode>
-        </friction>
-        <contact>
-          <ode>
-            <kp>5e5</kp>
-            <kd>50</kd>
-            <max_vel>0.01</max_vel>
-            <min_depth>0.001</min_depth>
-          </ode>
-        </contact>
-      </surface>
-    </gazebo>
-
     <joint name="${prefix}_joint" type="continuous">
       <parent link="${parent}"/>
-      <child link="${prefix}_hub"/>
+      <child link="${prefix}  "/>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <axis xyz="0 1 0"/>
       <dynamics damping="1.0" friction="0.5"/>

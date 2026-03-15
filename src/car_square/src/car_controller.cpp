@@ -54,35 +54,9 @@ class CarController : public rclcpp::Node {
                         msg.header.stamp = this->now();
                         msg.header.frame_id = "base_link";
 
-                        double raw_x = -joy->axes[0];
-                        double raw_y = -joy->axes[1];
-                        double raw_angular = joy->axes[3];
-
-                        double norm = std::hypot(raw_x, raw_y);
-
-                        if (norm > 1.0) {
-                                raw_x /= norm;
-                                raw_y /= norm;
-                        }
-
-                        double target_x = raw_x * speed;
-                        double target_y = raw_y * speed;
-                        double target_w = raw_angular * speed;
-
-                        auto step = [](double current, double target, double max_step) {
-                                double diff = target - current;
-                                if (diff > max_step) diff = max_step;
-                                if (diff < -max_step) diff = -max_step;
-                                return current + diff;
-                        };
-
-                        vx = step(vx, target_x, accel);
-                        vy = step(vy, target_y, accel);
-                        wz = step(wz, target_w, accel);
-
-                        msg.twist.linear.x = vx;
-                        msg.twist.linear.y = vy;
-                        msg.twist.angular.z = wz;
+                        msg.twist.linear.x = joy->axes[0] * speed;
+                        msg.twist.linear.y = joy->axes[1] * speed;
+                        msg.twist.angular.z = joy->axes[3] * speed / 2.0;
 
                         cmd_vel_pub->publish(msg);
                 }
@@ -146,7 +120,7 @@ class CarController : public rclcpp::Node {
                         double x_error_robot = -x_error * cos(theta_) + y_error * sin(theta_);
                         double y_error_robot = -x_error * sin(theta_) - y_error * cos(theta_);
 
-                        RCLCPP_INFO(this->get_logger(), "x=%f y=%f", x_, y_);
+                        RCLCPP_INFO(this->get_logger(), "x=%f y=%f ; x_target=%f y_target=%f theta_target=%f", x_, y_, x_target, y_target, theta_target);
 
                         auto msg_input = geometry_msgs::msg::TwistStamped();
 
@@ -165,7 +139,7 @@ class CarController : public rclcpp::Node {
                         msg_input.twist.linear.y  = vy;
                         msg_input.twist.angular.z = wz;
 
-                        cmd_vel_pub->publish(msg_input);
+                        //cmd_vel_pub->publish(msg_input);
                 }
 
                 rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub;
@@ -190,7 +164,6 @@ class CarController : public rclcpp::Node {
                 double Kp;
                 double wheel_radius;
                 double robot_radius;
-
 };
 
 

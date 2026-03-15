@@ -7,7 +7,6 @@
         </plugin>
     </gazebo>
 
-
     <!-- LIDAR SENSOR -->
     <gazebo>
         <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">

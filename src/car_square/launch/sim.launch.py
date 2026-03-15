@@ -108,8 +108,7 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster"],
-        parameters=[{"use_sim_time": True}],
-        remappings=[("/joint_states", "/joint_states_ros2control")]
+        parameters=[{"use_sim_time": True}]
     )
 
     # joint_state_publisher fusionne les deux sources → /joint_states
@@ -119,7 +118,6 @@ def generate_launch_description():
         executable="joint_state_publisher",
         parameters=[{
             "use_sim_time": True,
-            "source_list": ["/joint_states_gz", "/joint_states_ros2control"],
             "rate": 50.0
         }]
     )
@@ -168,6 +166,12 @@ def generate_launch_description():
         }]
     )
 
+    roller_mimic_node = launch_ros.actions.Node(
+        package="car_square",
+        executable="roller_mimic_node",
+        output="screen"
+    )
+
     # ── Description finale ───────────────────────────────────────────────────
     node_list = [
         gazebo,
@@ -179,6 +183,7 @@ def generate_launch_description():
         rviz_node,
 
         car_controller,
+        roller_mimic_node,
 
         post_spawn
     ]
