@@ -122,70 +122,11 @@
                         <plugin>gz_ros2_control/GazeboSimSystem</plugin>
                 </hardware>
 
-
-
-
-
                 <joint name="lf_joint">
                         <command_interface name="velocity"/>
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
                 </joint>
-
-
-                <joint name="lf_roller_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_neighbor_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_neighbor_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_neighbor_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lf_roller_neighbor_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-
-
-
-
-
 
                 <joint name="rf_joint">
                         <command_interface name="velocity"/>
@@ -193,173 +134,17 @@
                         <state_interface name="velocity"/>
                 </joint>
 
-
-                <joint name="rf_roller_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_neighbor_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_neighbor_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_neighbor_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rf_roller_neighbor_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-
-
-
-                <joint name="lb_joint">
-                        <command_interface name="velocity"/>
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-
-                <joint name="lb_roller_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_neighbor_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_neighbor_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_neighbor_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="lb_roller_neighbor_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-
-
-
-
                 <joint name="rb_joint">
                         <command_interface name="velocity"/>
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
                 </joint>
 
-
-                <joint name="rb_roller_0_joint">
-                        <command_interface name="velocity"/> 
+                <joint name="lb_joint">
+                        <command_interface name="velocity"/>
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
                 </joint>
-
-                <joint name="rb_roller_neighbor_0_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_neighbor_1_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_neighbor_2_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-                <joint name="rb_roller_neighbor_3_joint">
-                        <command_interface name="velocity"/> 
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                </joint>
-
-
 
 
         </ros2_control>

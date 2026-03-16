@@ -5,4 +5,4 @@ car_controller:
     wheel_radius: 0.315
     robot_radius: 1.750
     accel: 1.0
-    controlable: false
+    controlable: true

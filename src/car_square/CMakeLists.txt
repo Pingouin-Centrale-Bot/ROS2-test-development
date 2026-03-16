@@ -13,9 +13,12 @@ find_package(control_msgs REQUIRED)
 find_package(robot_messages REQUIRED)
 
 add_executable(car_controller src/car_controller.cpp)
-ament_target_dependencies(car_controller rclcpp geometry_msgs sensor_msgs control_msgs robot_messages)
+ament_target_dependencies(car_controller rclcpp geometry_msgs sensor_msgs robot_messages)
 
-install(TARGETS car_controller
+add_executable(joint_states_exporter src/joint_states_exporter.cpp)
+ament_target_dependencies(joint_states_exporter rclcpp control_msgs sensor_msgs)
+
+install(TARGETS car_controller joint_states_exporter
   DESTINATION lib/${PROJECT_NAME})
 
 install(

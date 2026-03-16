@@ -158,6 +158,11 @@ def generate_launch_description():
         parameters = [controller_config]
     )
 
+    joint_states_exporter = launch_ros.actions.Node(
+        package="car_square",
+        executable="joint_states_exporter"
+    )
+
     joy_node = launch_ros.actions.Node(
         package="joy",
         executable="joy_node",
@@ -177,6 +182,7 @@ def generate_launch_description():
         rviz_node,
 
         car_controller,
+        joint_states_exporter,
 
         post_spawn
     ]
